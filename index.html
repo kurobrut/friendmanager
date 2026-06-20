@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roblox Friend Manager Pro</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #00d9ff;
+    --secondary: #7c3aed;
+    --accent: #ff006e;
+    --dark-bg: #0a0e27;
+    --card-bg: rgba(15, 23, 42, 0.85);
+    --border: rgba(255, 255, 255, 0.08);
+    --text-primary: #ffffff;
+    --text-secondary: #a1afc7;
+    --success: #10b981;
+    --danger: #ef4444;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background: var(--dark-bg);
+    color: var(--text-primary);
+    position: relative;
+    padding: 50px 30px;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+        radial-gradient(circle at 10% 20%, rgba(0, 217, 255, 0.15), transparent 25%),
+        radial-gradient(circle at 90% 10%, rgba(124, 58, 237, 0.12), transparent 30%),
+        radial-gradient(circle at 50% 90%, rgba(255, 0, 110, 0.08), transparent 35%),
+        radial-gradient(ellipse at 80% 80%, rgba(16, 185, 129, 0.08), transparent 40%);
+    background-attachment: fixed;
+    pointer-events: none;
+    z-index: -2;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.5;
+}
+
+@keyframes slide-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scale-in {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+.container {
+    max-width: 1500px;
+    margin: auto;
+    position: relative;
+    z-index: 1;
+}
+
+/* Header */
+.header {
+    margin-bottom: 50px;
+    animation: slide-in 0.6s ease-out;
+    padding-bottom: 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.header-icon {
+    font-size: 48px;
+    color: var(--primary);
+    margin-bottom: 15px;
+    display: inline-block;
+}
+
+.header-content h1 {
+    font-size: 64px;
+    font-weight: 900;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+    letter-spacing: -2px;
+}
+
+.header-content p {
+    color: var(--text-secondary);
+    font-size: 18px;
+    font-weight: 500;
+}
+
+/* Card */
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    backdrop-filter: blur(25px);
+    border-radius: 32px;
+    padding: 40px;
+    margin-bottom: 35px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    animation: scale-in 0.5s ease-out;
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(0, 217, 255, 0.1), transparent);
+    pointer-events: none;
+}
+
+.card-title {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 28px;
+    color: var(--text-primary);
+    letter-spacing: -1px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.card-title i {
+    color: var(--primary);
+    font-size: 32px;
+}
+
+.input {
+    width: 100%;
+    background: rgba(10, 15, 35, 0.8);
+    border: 1.5px solid var(--border);
+    color: var(--text-primary);
+    padding: 16px 20px;
+    border-radius: 16px;
+    outline: none;
+    font-size: 15px;
+    font-family: 'Poppins', sans-serif;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.input::placeholder { color: rgba(161, 175, 199, 0.6); }
+
+.input:focus {
+    border-color: var(--primary);
+    background: rgba(0, 217, 255, 0.05);
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.2);
+}
+
+.actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.btn {
+    border: none;
+    padding: 16px 24px;
+    border-radius: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.23, 1, 0.320, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:active::before { width: 300px; height: 300px; }
+.btn:hover { transform: translateY(-4px); }
+
+.primary {
+    background: linear-gradient(135deg, var(--primary), #00b8d4);
+    color: var(--dark-bg);
+    box-shadow: 0 10px 30px rgba(0, 217, 255, 0.3);
+}
+
+.primary:hover { box-shadow: 0 15px 40px rgba(0, 217, 255, 0.5); }
+
+.danger {
+    background: linear-gradient(135deg, var(--danger), #dc2626);
+    color: white;
+    box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+}
+
+.danger:hover { box-shadow: 0 15px 40px rgba(239, 68, 68, 0.5); }
+
+.secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--primary);
+    border: 1.5px solid var(--primary);
+}
+
+.secondary:hover {
+    background: rgba(0, 217, 255, 0.15);
+    box-shadow: 0 10px 30px rgba(0, 217, 255, 0.2);
+}
+
+.status {
+    margin-top: 20px;
+    padding: 16px 20px;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 16px;
+    color: #86efac;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status::before {
+    content: '✓';
+    font-size: 18px;
+    display: inline-block;
+}
+
+.warning {
+    display: none;
+    margin-top: 20px;
+    padding: 18px 20px;
+    border-radius: 16px;
+    background: rgba(255, 193, 7, 0.12);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    color: #fcd34d;
+    font-weight: 600;
+    animation: scale-in 0.3s ease-out;
+}
+
+.search-section {
+    margin-bottom: 35px;
+    position: relative;
+}
+
+.search-icon {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    z-index: 1;
+}
+
+.search-input {
+    max-width: 100%;
+    margin-bottom: 0;
+    padding-left: 50px;
+}
+
+.friends-label {
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.friend-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 20px;
+}
+
+/* Friend card — entire card is clickable */
+.friend {
+    background: var(--card-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 24px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.35s cubic-bezier(0.23, 1, 0.320, 1);
+    position: relative;
+    overflow: hidden;
+    animation: slide-in 0.5s ease-out;
+    cursor: pointer; /* whole card is clickable */
+    user-select: none;
+}
+
+.friend::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, rgba(0, 217, 255, 0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+.friend:hover {
+    transform: translateY(-6px) scale(1.02);
+    border-color: var(--primary);
+    box-shadow: 0 20px 50px rgba(0, 217, 255, 0.2);
+}
+
+.friend:hover::before { opacity: 1; }
+
+.friend.selected {
+    border-color: var(--primary);
+    background: rgba(0, 217, 255, 0.08);
+}
+
+/* Checkbox wrapper — visual only, pointer-events none so card click handles it */
+.checkbox-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    background: rgba(0, 217, 255, 0.05);
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    z-index: 1;
+    pointer-events: none; /* card handles the click */
+}
+
+.friend.selected .checkbox-wrapper {
+    border-color: var(--primary);
+    background: rgba(0, 217, 255, 0.3);
+}
+
+/* Hide the native checkbox, show a custom tick instead */
+.checkbox {
+    display: none;
+}
+
+/* Custom tick icon inside checkbox-wrapper */
+.checkbox-wrapper::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: transparent;
+    transition: background 0.2s ease;
+}
+
+.friend.selected .checkbox-wrapper::after {
+    background: var(--primary);
+    box-shadow: 0 0 6px rgba(0, 217, 255, 0.6);
+}
+
+.friend img {
+    width: 80px;
+    height: 80px;
+    border-radius: 16px;
+    border: 2px solid var(--border);
+    object-fit: cover;
+    transition: all 0.3s;
+    flex-shrink: 0;
+    background: rgba(100, 100, 100, 0.3);
+    pointer-events: none;
+}
+
+.friend:hover img {
+    border-color: var(--primary);
+    transform: scale(1.08);
+}
+
+.friend-info {
+    flex: 1;
+    z-index: 2;
+    min-width: 0;
+    pointer-events: none;
+}
+
+.display {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.username {
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.empty {
+    text-align: center;
+    padding: 100px 30px;
+    border-radius: 28px;
+    border: 2px dashed var(--border);
+    color: var(--text-secondary);
+    font-size: 16px;
+    grid-column: 1 / -1;
+    animation: scale-in 0.4s ease-out;
+}
+
+.empty i {
+    font-size: 48px;
+    margin-bottom: 15px;
+    display: block;
+    opacity: 0.5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    body { padding: 30px 20px; }
+    .header-content h1 { font-size: 42px; }
+    .card { padding: 28px; }
+    .card-title { font-size: 22px; }
+    .actions { grid-template-columns: 1fr; }
+    .friend-grid { grid-template-columns: 1fr; }
+    .friend { padding: 16px; }
+    .friend img { width: 70px; height: 70px; }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <div class="header-icon">
+            <i class="fas fa-users"></i>
+        </div>
+        <div class="header-content">
+            <h1>Friend Manager</h1>
+            <p>Automatically Removes your Friends</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-title">
+            <i class="fas fa-lock"></i>
+            Account Access
+        </div>
+
+        <input
+            type="password"
+            id="cookie"
+            class="input"
+            placeholder="Paste your .ROBLOSECURITY cookie"
+        >
+
+        <div class="actions">
+            <button class="btn primary" onclick="loadFriends()">
+                <i class="fa-solid fa-download"></i>
+                Load Friends
+            </button>
+
+            <button class="btn danger" onclick="unfriendSelected()">
+                <i class="fa-solid fa-user-minus"></i>
+                Unfriend Selected
+            </button>
+
+            <button class="btn danger" onclick="unfriendAll()">
+                <i class="fa-solid fa-trash"></i>
+                Unfriend All
+            </button>
+
+            <button class="btn secondary" onclick="selectAllFriends()">
+                <i class="fa-solid fa-check-double"></i>
+                Select All
+            </button>
+        </div>
+
+        <div id="status" class="status">
+            Ready to manage your friends
+        </div>
+
+        <div id="warningBox" class="warning">
+            ⚠️ Roblox is rate limiting requests. Slowing down automatically...
+        </div>
+    </div>
+
+    <div class="search-section">
+        <i class="fas fa-search search-icon"></i>
+        <input
+            type="text"
+            id="search"
+            class="input search-input"
+            placeholder="Search by username or display name..."
+            oninput="filterFriends()"
+        >
+    </div>
+
+    <div class="friends-label" id="friendsLabel"></div>
+
+    <div id="friendList" class="friend-grid">
+        <div class="empty">
+            <i class="fa-solid fa-users"></i>
+            No friends loaded yet
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+let friends = [];
+
+// Track selected IDs separately so filtering doesn't lose selections
+const selectedIds = new Set();
+
+function setStatus(text) {
+    const statusEl = document.getElementById('status');
+    statusEl.innerText = text;
+    statusEl.style.animation = 'none';
+    setTimeout(() => statusEl.style.animation = '', 10);
+}
+
+function updateStats() {
+    const label = document.getElementById('friendsLabel');
+    label.textContent = friends.length > 0 ? `${friends.length} Friends` : '';
+}
+
+function showRateLimitWarning() {
+    const box = document.getElementById('warningBox');
+    box.style.display = 'block';
+    setTimeout(() => { box.style.display = 'none'; }, 5000);
+}
+
+async function api(action, data = {}) {
+    const response = await fetch('api.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, ...data })
+    });
+    return await response.json();
+}
+
+// Toggle a friend card by its ID
+function toggleFriend(id) {
+    if (selectedIds.has(id)) {
+        selectedIds.delete(id);
+    } else {
+        selectedIds.add(id);
+    }
+    // Update the visual state of just this card
+    const card = document.querySelector(`.friend[data-friend-id="${id}"]`);
+    if (card) {
+        card.classList.toggle('selected', selectedIds.has(id));
+    }
+}
+
+async function loadFriends() {
+    const cookie = document.getElementById('cookie').value.trim();
+
+    if (!cookie) {
+        alert('Paste your .ROBLOSECURITY cookie first');
+        return;
+    }
+
+    setStatus('Loading friends...');
+
+    const result = await api('friends', { cookie });
+
+    if (result.error) {
+        setStatus('Error: ' + result.error);
+        return;
+    }
+
+    friends = result.friends || [];
+    selectedIds.clear();
+    renderFriends(friends);
+    updateStats();
+
+    let avatarMsg = result.avatarsLoaded
+        ? ` (${result.avatarsLoaded}/${result.totalFriends} avatars loaded)`
+        : '';
+
+    setStatus(`✓ ${friends.length} friends loaded successfully${avatarMsg}`);
+}
+
+function renderFriends(list) {
+    const container = document.getElementById('friendList');
+
+    if (!list.length) {
+        container.innerHTML = `
+            <div class="empty">
+                <i class="fa-solid fa-inbox"></i>
+                No friends to display
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = list.map(friend => `
+        <div
+            class="friend${selectedIds.has(friend.id) ? ' selected' : ''}"
+            data-friend-id="${friend.id}"
+            onclick="toggleFriend(${friend.id})"
+        >
+            <div class="checkbox-wrapper">
+                <input type="checkbox" class="checkbox" data-id="${friend.id}"${selectedIds.has(friend.id) ? ' checked' : ''}>
+            </div>
+            <img
+                src="${friend.avatar}"
+                alt="${friend.displayName}"
+                loading="lazy"
+                crossorigin="anonymous"
+                referrerpolicy="no-referrer"
+                onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 150 150%22%3E%3Crect fill=%22%23333333%22 width=%22150%22 height=%22150%22/%3E%3Ccircle cx=%2275%22 cy=%2260%22 r=%2225%22 fill=%22%23666666%22/%3E%3Cpath d=%22M 40 120 Q 40 100 75 100 Q 110 100 110 120%22 fill=%22%23666666%22/%3E%3C/svg%3E'"
+            >
+            <div class="friend-info">
+                <div class="display">${friend.displayName}</div>
+                <div class="username">@${friend.username}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function filterFriends() {
+    const query = document.getElementById('search').value.toLowerCase();
+    const filtered = friends.filter(friend =>
+        friend.username.toLowerCase().includes(query) ||
+        friend.displayName.toLowerCase().includes(query)
+    );
+    renderFriends(filtered);
+}
+
+function selectAllFriends() {
+    friends.forEach(f => selectedIds.add(f.id));
+    // Re-render visible cards with updated selection
+    const query = document.getElementById('search').value.toLowerCase();
+    const filtered = query
+        ? friends.filter(f =>
+            f.username.toLowerCase().includes(query) ||
+            f.displayName.toLowerCase().includes(query))
+        : friends;
+    renderFriends(filtered);
+}
+
+async function runUnfriendLoop(ids, total) {
+    const cookie = document.getElementById('cookie').value;
+
+    let done = 0;
+    let failed = 0;
+    let delay = 600;
+
+    for (const id of ids) {
+        done++;
+        setStatus(`Unfriending ${done}/${total}... (${failed} failed)`);
+
+        let result;
+        try {
+            result = await api('unfriend', { cookie, userId: id });
+        } catch(e) {
+            // Network error — wait and continue
+            failed++;
+            await new Promise(r => setTimeout(r, 2000));
+            continue;
+        }
+
+        if (result.rateLimited) {
+            showRateLimitWarning();
+            // Back off and retry this same ID
+            await new Promise(r => setTimeout(r, 5000));
+            done--;
+            ids.unshift(id); // re-queue at front
+            continue;
+        }
+
+        if (!result.success) {
+            failed++;
+        }
+
+        // Adaptive delay: slow down if things are failing
+        delay = failed > 2 ? 1500 : 600;
+        await new Promise(r => setTimeout(r, delay));
+    }
+
+    return { done, failed };
+}
+
+async function unfriendSelected() {
+    const cookie = document.getElementById('cookie').value;
+    const selected = [...selectedIds];
+
+    if (!selected.length) {
+        alert('Select users first');
+        return;
+    }
+
+    const { done, failed } = await runUnfriendLoop(selected, selected.length);
+
+    if (failed > 0) {
+        setStatus(`⚠ Done — ${done - failed}/${done} unfriended (${failed} failed)`);
+    } else {
+        setStatus(`✓ Finished unfriending ${done} users`);
+    }
+
+    await loadFriends();
+}
+
+async function unfriendAll() {
+    const cookie = document.getElementById('cookie').value;
+
+    if (!friends.length) {
+        alert('No friends loaded');
+        return;
+    }
+
+    const confirmed = confirm(`Remove all ${friends.length} friends? This cannot be undone.`);
+    if (!confirmed) return;
+
+    const ids = friends.map(f => f.id);
+    const { done, failed } = await runUnfriendLoop(ids, ids.length);
+
+    if (failed > 0) {
+        setStatus(`⚠ Done — ${done - failed}/${done} unfriended (${failed} failed)`);
+        await loadFriends(); // reload to show whoever is left
+    } else {
+        friends = [];
+        selectedIds.clear();
+        renderFriends([]);
+        updateStats();
+        setStatus(`✓ All ${done} friends removed`);
+    }
+}
+
+</script>
+
+</body>
+</html>
